@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Copyright (c) 2013-2016 by appPlant UG. All rights reserved.
+ *
+ * @APPPLANT_LICENSE_HEADER_START@
+ *
+ * This file contains Original Code and/or Modifications of Original Code
+ * as defined in and that are subject to the Apache License
+ * Version 2.0 (the 'License'). You may not use this file except in
+ * compliance with the License. Please obtain a copy of the License at
+ * http://opensource.org/licenses/Apache-2.0/ and read it before using this
+ * file.
+ *
+ * The Original Code and all software distributed under the License are
+ * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
+ * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
+ * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
+ * Please see the License for the specific language governing rights and
+ * limitations under the License.
+ *
+ * @APPPLANT_LICENSE_HEADER_END@
+-->
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        id="cordova-plugin-unionpay"
+        version="0.0.1">
+
+    <name>UnionPay</name>
+
+    <description>
+        UnionPay
+    </description>
+
+    <keywords>cordova, unionpay</keywords>
+
+    <license>Apache 2.0</license>
+
+    <author>recca0120</author>
+
+    <!-- cordova -->
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+        <engine name="cordova-android" version=">=4"/>
+        <engine name="cordova-plugman" version=">=4.2.0"/><!-- needed for gradleReference support -->
+    </engines>
+
+    <preference name="SCODE" />
+    <preference name="KEY" />
+
+    <!-- dependencies -->
+
+    <!-- js -->
+    <js-module src="www/unionpay.js" name="Unionpay">
+        <clobbers target="Unionpay" />
+    </js-module>
+
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/values/strings.xml" parent="/resources">
+            <string name="unionpay_scode">$SCODE</string>
+            <string name="unionpay_key">$KEY</string>
+        </config-file>
+
+
+        <config-file target="config.xml" parent="/*">
+            <feature name="Unionpay">
+                <param name="android-package" value="com.recca0120.cordova.plugin.Unionpay"/>
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/libs/unionpaysdkv1.jar" target-dir="libs"/>
+        <source-file src="src/android/src/com/recca0120/cordova/plugin/Unionpay.java" target-dir="src/com/recca0120/cordova/plugin" />
+        <source-file src="src/android/res/layout/activity_unionpay_webview.xml" target-dir="res/layout/" />
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+            <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+            <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+            <uses-permission android:name="android.permission.READ_LOGS" />
+            <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+            <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+            <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+            <uses-permission android:name="android.permission.NETWORK" />
+            <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+            <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <activity
+                  android:name="com.unionpaysdk.web.WebviewActivity"
+                  android:theme="@android:style/Theme.Translucent.NoTitleBar"
+                  android:configChanges="orientation|keyboardHidden|screenSize|locale">
+            </activity>
+        </config-file>
+    </platform>
+
+</plugin>
