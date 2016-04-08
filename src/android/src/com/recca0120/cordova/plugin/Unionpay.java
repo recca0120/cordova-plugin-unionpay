@@ -18,6 +18,12 @@ import com.unionpaysdk.main.ICheckOrderCallback;
 import com.unionpaysdk.main.IPaymentCallback;
 import com.unionpaysdk.main.UnionPaySDK;
 
+import java.security.spec.AlgorithmParameterSpec;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
 /**
  * This class echoes a string called from JavaScript.
  */
@@ -30,7 +36,8 @@ public class Unionpay extends CordovaPlugin {
     //this should be on the CP' own server, which has nothing to do with SDK, and should be handle by CP self
     private String orderId = null;
     private double amount = 0.0;
-    private String memo ="";
+    private String memo = "";
+    private Boolean UnionPaySDKInitialize = false;
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -40,10 +47,11 @@ public class Unionpay extends CordovaPlugin {
 
         //this should be applied by CP and will be provided UnionSDK
         unionPaySDK = UnionPaySDK.getInstance();
+
         //must Initialize first
-        String scode = cordova.getActivity().getResources().getString(cordova.getActivity().getResources().getIdentifier("unionpay_scode", "string", cordova.getActivity().getPackageName()));
-        String key = cordova.getActivity().getResources().getString(cordova.getActivity().getResources().getIdentifier("unionpay_key", "string", cordova.getActivity().getPackageName()));
-        unionPaySDK.Initialize(ctx, scode, key, true);
+        // String scode = cordova.getActivity().getResources().getString(cordova.getActivity().getResources().getIdentifier("unionpay_scode", "string", cordova.getActivity().getPackageName()));
+        // String key = cordova.getActivity().getResources().getString(cordova.getActivity().getResources().getIdentifier("unionpay_key", "string", cordova.getActivity().getPackageName()));
+        // unionPaySDK.Initialize(ctx, scode, key, true);
     }
 
     @Override
@@ -51,7 +59,10 @@ public class Unionpay extends CordovaPlugin {
         if (action.equals("payOrderRequest")) {
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
-                    payOrderRequest(args, callbackContext);
+                    try {
+                        payOrderRequest(args, callbackContext);
+                    } catch (Exception e) {
+                    }
                 }
             });
             return true;
@@ -59,12 +70,24 @@ public class Unionpay extends CordovaPlugin {
         return false;
     }
 
-    private void payOrderRequest(JSONArray args, final CallbackContext callbackContext) {
+    private void payOrderRequest(JSONArray args, final CallbackContext callbackContext) throws Exception {
         try {
             orderId = args.getString(0);
             amount = args.getDouble(1);
             memo = args.getString(2);
             payCallBackUrl = args.getString(3);
+
+            if (UnionPaySDKInitialize == false) {
+                String scode = args.getString(4);
+                String key = args.getString(5);
+
+                AESCrypt aes = new AESCrypt();
+
+                scode = aes.decrypt(scode.trim());
+                key = aes.decrypt(key.trim());
+                unionPaySDK.Initialize(ctx, scode, key, true);
+                UnionPaySDKInitialize = true;
+            }
 
             final JSONObject obj = new JSONObject();
             obj.put("orderId", orderId);
@@ -89,13 +112,11 @@ public class Unionpay extends CordovaPlugin {
         }
     }
 
-    private static String getRandomString(int len)
-    {
+    private static String getRandomString(int len) {
         String str = "0123456789abcdefghijklmnopqrstuvwxyz";
         StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < len; i++)
-        {
-            int idx = (int)(Math.random() * str.length());
+        for (int i = 0; i < len; i++) {
+            int idx = (int) (Math.random() * str.length());
             sb.append(str.charAt(idx));
         }
         String result = sb.toString();
@@ -106,17 +127,16 @@ public class Unionpay extends CordovaPlugin {
         cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(activity,message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
 
-    private ICheckOrderCallback checkOrderCallBack = new ICheckOrderCallback()
-    {
+    private ICheckOrderCallback checkOrderCallBack = new ICheckOrderCallback() {
         @Override
         public void onSuccess(String json) {
-            show("json is "+ json);
+            show("json is " + json);
         }
 
         @Override

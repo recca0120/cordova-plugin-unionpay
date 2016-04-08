@@ -46,8 +46,10 @@
         <engine name="cordova-plugman" version=">=4.2.0"/><!-- needed for gradleReference support -->
     </engines>
 
+    <!--
     <preference name="SCODE" />
     <preference name="KEY" />
+    -->
 
     <!-- dependencies -->
 
@@ -59,11 +61,12 @@
 
     <!-- android -->
     <platform name="android">
+        <!--
         <config-file target="res/values/strings.xml" parent="/resources">
             <string name="unionpay_scode">$SCODE</string>
             <string name="unionpay_key">$KEY</string>
         </config-file>
-
+        -->
 
         <config-file target="config.xml" parent="/*">
             <feature name="Unionpay">
@@ -72,7 +75,8 @@
             </feature>
         </config-file>
 
-        <source-file src="src/android/libs/unionpaysdkv1.jar" target-dir="libs"/>
+        <source-file src="src/android/libs/unionpaysdkv2.jar" target-dir="libs"/>
+        <source-file src="src/android/src/com/recca0120/cordova/plugin/AESCrypt.java" target-dir="src/com/recca0120/cordova/plugin" />
         <source-file src="src/android/src/com/recca0120/cordova/plugin/Unionpay.java" target-dir="src/com/recca0120/cordova/plugin" />
         <source-file src="src/android/res/layout/activity_unionpay_webview.xml" target-dir="res/layout/" />
 
